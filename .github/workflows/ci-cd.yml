@@ -1,0 +1,504 @@
+# =============================================================================
+# AeroSense CI/CD Pipeline - GitHub Actions
+# =============================================================================
+# This workflow handles:
+# - Backend: build, test, lint, and deploy to AWS ECS
+# - iOS: build, test, and deploy to TestFlight/App Store
+# - Infrastructure: Terraform validation and apply
+# =============================================================================
+
+name: AeroSense CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  AWS_REGION: 'us-east-1'
+  ECR_REPOSITORY: aerosense-backend
+  ECS_CLUSTER: aerosense-prod
+  ECS_SERVICE: aerosense-prod-backend
+
+# =============================================================================
+# JOBS
+# =============================================================================
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Backend - Quality Checks
+  # ---------------------------------------------------------------------------
+  backend-lint:
+    name: Backend - Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  backend-typecheck:
+    name: Backend - Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Type check
+        run: npm run typecheck
+
+  # ---------------------------------------------------------------------------
+  # Backend - Tests
+  # ---------------------------------------------------------------------------
+  backend-test:
+    name: Backend - Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: aerosense_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: aerosense_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+        env:
+          DATABASE_URL: postgresql://aerosense_test:test_password@localhost:5432/aerosense_test
+
+      - name: Run database migrations
+        run: npm run prisma:migrate deploy
+        env:
+          DATABASE_URL: postgresql://aerosense_test:test_password@localhost:5432/aerosense_test
+
+      - name: Run tests
+        run: npm run test -- --coverage
+        env:
+          DATABASE_URL: postgresql://aerosense_test:test_password@localhost:5432/aerosense_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+  # ---------------------------------------------------------------------------
+  # Backend - Build & Deploy
+  # ---------------------------------------------------------------------------
+  backend-build:
+    name: Backend - Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [backend-lint, backend-typecheck, backend-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ steps.meta.outputs.created }}
+            VCS_REF=${{ github.sha }}
+            VERSION=${{ steps.meta.outputs.version }}
+
+  backend-deploy:
+    name: Backend - Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: backend-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update ECS service
+        uses: aws-actions/amazon-ecs-deploy@v1
+        with:
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          image: ${{ needs.backend-build.outputs.image-tag }}
+          task-definition: aerosense-backend
+          wait-for-service-stability: true
+          force_new_deployment: true
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure - Terraform
+  # ---------------------------------------------------------------------------
+  terraform-validate:
+    name: Terraform - Validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure/terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+  terraform-plan:
+    name: Terraform - Plan
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    if: github.event_name == 'pull_request'
+    defaults:
+      run:
+        working-directory: ./infrastructure/terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -no-color
+
+      - name: Save plan to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: infrastructure/terraform/tfplan
+
+  terraform-apply:
+    name: Terraform - Apply
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: ./infrastructure/terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        env:
+          TF_VAR_environment: prod
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+          TF_VAR_redis_auth_token: ${{ secrets.REDIS_AUTH_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # iOS - Build & Test
+  # ---------------------------------------------------------------------------
+  ios-build:
+    name: iOS - Build
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: ./ios
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+
+      - name: Install dependencies (SPM)
+        run: |
+          cd AeroSense
+          swift package resolve
+
+      - name: Build for Testing
+        run: |
+          cd AeroSense
+          xcodebuild build-for-testing \
+            -scheme AeroSense \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+            -derivedDataPath ./DerivedData \
+            -quiet
+
+      - name: Run Unit Tests
+        run: |
+          cd AeroSense
+          xcodebuild test \
+            -scheme AeroSense \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+            -derivedDataPath ./DerivedData \
+            -enableCodeCoverage YES \
+            -quiet
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./ios/AeroSense/DerivedData/Logs/Test/*.xcresult
+          flags: ios
+          name: ios-coverage
+
+  ios-testflight:
+    name: iOS - Deploy to TestFlight
+    runs-on: macos-14
+    needs: ios-build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    defaults:
+      run:
+        working-directory: ./ios
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+
+      - name: Install dependencies
+        run: |
+          cd AeroSense
+          swift package resolve
+
+      - name: Build and Archive
+        run: |
+          cd AeroSense
+          xcodebuild archive \
+            -scheme AeroSense \
+            -archivePath ./build/AeroSense.xcarchive \
+            -derivedDataPath ./DerivedData \
+            -quiet
+
+      - name: Upload to TestFlight
+        run: |
+          cd AeroSense
+          xcodebuild -exportArchive \
+            -archivePath ./build/AeroSense.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath ./build/IPA \
+            -quiet
+
+      - name: Upload to App Store Connect
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-store-connect-api-key: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          app-store-connect-api-key-issuer: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER }}
+          app-store-connect-api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          path: ./ios/build/IPA/AeroSense.ipa
+
+  # ---------------------------------------------------------------------------
+  # Security Scanning
+  # ---------------------------------------------------------------------------
+  security-scan:
+    name: Security - Scan Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run npm audit (backend)
+        run: |
+          cd backend
+          npm audit --audit-level=moderate || true
+
+      - name: Run Swift Package Audit (iOS)
+        run: |
+          cd ios/AeroSense
+          swift package audit || true
+
+  # ---------------------------------------------------------------------------
+  # Notification
+  # ---------------------------------------------------------------------------
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [backend-deploy, terraform-apply]
+    if: always()
+
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment ${{ job.status }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
+# =============================================================================
+# END OF WORKFLOW
+# =============================================================================

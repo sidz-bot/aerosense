@@ -1,0 +1,322 @@
+// AeroSense Database Schema
+// Version: 1.0
+// Last Updated: 2025-12-28
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// User Models
+// =============================================================================
+
+enum UserRole {
+  FREE
+  PREMIUM
+  ADMIN
+}
+
+enum OAuthProvider {
+  GOOGLE
+  APPLE
+}
+
+model User {
+  id                String          @id @default(cuid())
+  email             String          @unique
+  emailVerified     Boolean         @default(false)
+  password          String?         // Null for OAuth-only users
+  name              String?
+  role              UserRole        @default(FREE)
+  avatarUrl         String?
+
+  // OAuth fields
+  oauthProvider     OAuthProvider?
+  oauthProviderId   String?         // Provider's user ID
+
+  // JWT settings
+  refreshToken      String?         @unique
+
+  // Notification preferences
+  notificationEnabled    Boolean @default(true)
+  gateChangeAlerts      Boolean @default(true)
+  delayAlerts           Boolean @default(true)
+  boardingAlerts        Boolean @default(true)
+  connectionRiskAlerts  Boolean @default(true)
+  quietHoursStart       String? // HH:mm format
+  quietHoursEnd         String? // HH:mm format
+
+  // Push notifications
+  deviceTokens      DeviceToken[]
+
+  // Relations
+  trackedFlights    UserFlight[]
+
+  // Metadata
+  lastLoginAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([email])
+  @@index([oauthProvider, oauthProviderId])
+  @@map("users")
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   // APNS device token
+  platform  String   // "ios"
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@index([token])
+  @@map("device_tokens")
+}
+
+// =============================================================================
+// Flight Models
+// =============================================================================
+
+enum FlightStatus {
+  SCHEDULED
+  DELAYED
+  IN_AIR
+  LANDED
+  CANCELED
+  BOARDING
+  DEPARTED
+  DIVERTED
+}
+
+enum ConnectionRiskLevel {
+  ON_TRACK
+  AT_RISK
+  HIGH_RISK
+  CRITICAL
+}
+
+model Airport {
+  id          String   @id
+  code        String   @unique // IATA code (e.g., "SFO")
+  name        String
+  city        String
+  country     String
+  latitude    Float
+  longitude   Float
+  timezone    String
+
+  // Relations
+  departingFlights Flight[] @relation("DepartingAirport")
+  arrivingFlights   Flight[] @relation("ArrivingAirport")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([code])
+  @@map("airports")
+}
+
+model Flight {
+  id                String        @id @default(cuid())
+  airlineCode       String        // IATA airline code (e.g., "AA")
+  airlineName       String
+  flightNumber      String        // Flight number (e.g., "1234")
+
+  // Route
+  originId          String
+  origin            Airport       @relation("DepartingAirport", fields: [originId], references: [id])
+  destinationId     String
+  destination       Airport       @relation("ArrivingAirport", fields: [destinationId], references: [id])
+
+  // Times (all ISO 8601 strings)
+  scheduledDeparture String       // UTC
+  scheduledArrival   String       // UTC
+  estimatedDeparture String?      // UTC
+  estimatedArrival   String?      // UTC
+  actualDeparture    String?      // UTC
+  actualArrival      String?      // UTC
+
+  // Gate information
+  departureGate      String?
+  arrivalGate        String?
+  terminal           String?
+  baggageClaim       String?
+
+  // Status
+  status            FlightStatus  @default(SCHEDULED)
+  delayMinutes      Int           @default(0)
+
+  // Aircraft
+  aircraftType      String?
+  flightDistance    Int?          // In miles
+
+  // Metadata
+  lastFetchedAt     DateTime      @default(now())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  trackedBy         UserFlight[]
+  incomingConnections Connection[] @relation("IncomingFlight")
+  outgoingConnections Connection[] @relation("OutgoingFlight")
+
+  @@unique([airlineCode, flightNumber, scheduledDeparture])
+  @@index([airlineCode, flightNumber])
+  @@index([scheduledDeparture])
+  @@index([status])
+  @@map("flights")
+}
+
+// Join table for User <-> Flight tracking
+model UserFlight {
+  id              String        @id @default(cuid())
+  userId          String
+  flightId        String
+  isPrimary       Boolean       @default(true) // For multi-segment itineraries
+
+  // Per-flight notification preferences
+  notificationEnabled    Boolean @default(true)
+  gateChangeAlerts       Boolean @default(true)
+  delayAlerts            Boolean @default(true)
+  boardingAlerts         Boolean @default(true)
+  connectionRiskAlerts   Boolean @default(true)
+
+  // Connection info (if this flight is part of a connection)
+  connectionFlightId String? // ID of the UserFlight for connecting flight
+  connectionRisk     ConnectionRiskLevel?
+  connectionRiskCalculatedAt DateTime?
+
+  // Metadata
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flight          Flight        @relation(fields: [flightId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, flightId])
+  @@index([userId])
+  @@index([flightId])
+  @@map("user_flights")
+}
+
+// Connection analysis between two flights
+model Connection {
+  id                String              @id @default(cuid())
+  incomingFlightId  String
+  incomingFlight    Flight              @relation("IncomingFlight", fields: [incomingFlightId], references: [id])
+  outgoingFlightId  String
+  outgoingFlight    Flight              @relation("OutgoingFlight", fields: [outgoingFlightId], references: [id])
+
+  // Connection details
+  bufferMinutes     Int                 // Scheduled connection time
+  effectiveBuffer   Int                 // Buffer minus current delays
+
+  // Risk calculation
+  riskLevel         ConnectionRiskLevel
+  riskFactors       Json?               // Array of risk factor objects
+  confidence        Float               @default(0.8) // 0-1
+
+  // Gate info
+  incomingGate      String?
+  outgoingGate      String?
+  terminalChange    Boolean             @default(false)
+  estimatedWalkTime Int?                // In minutes
+
+  // Historical data
+  historicalOnTimeRate Float?
+
+  calculatedAt      DateTime            @default(now())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@unique([incomingFlightId, outgoingFlightId])
+  @@index([incomingFlightId])
+  @@index([outgoingFlightId])
+  @@map("connections")
+}
+
+// =============================================================================
+// Notification Models
+// =============================================================================
+
+enum NotificationType {
+  GATE_CHANGE
+  DELAY
+  BOARDING_SOON
+  CONNECTION_RISK
+  CONNECTION_STATUS_CHANGE
+  FLIGHT_CANCELED
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+model Notification {
+  id              String            @id @default(cuid())
+  userId          String
+  flightId        String
+  type            NotificationType
+  status          NotificationStatus @default(PENDING)
+
+  // Payload
+  title           String
+  body            String
+  data            Json?             // Additional data
+
+  // Delivery tracking
+  sentAt          DateTime?
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+  failureReason   String?
+
+  createdAt       DateTime          @default(now())
+
+  @@index([userId, createdAt])
+  @@index([flightId])
+  @@index([status])
+  @@map("notifications")
+}
+
+// =============================================================================
+// Audit / Change Log Models
+// =============================================================================
+
+enum ChangeType {
+  GATE_CHANGE
+  TIME_CHANGE
+  STATUS_CHANGE
+  DELAY_UPDATE
+  CANCELLATION
+}
+
+model FlightChangeLog {
+  id          String      @id @default(cuid())
+  flightId    String
+  type        ChangeType
+
+  // Old and new values (stored as JSON for flexibility)
+  oldValue    Json?
+  newValue    Json?
+
+  // Source of the change
+  source      String      // "FlightAware", "Manual", etc.
+
+  detectedAt  DateTime    @default(now())
+
+  @@index([flightId, detectedAt])
+  @@map("flight_change_logs")
+}

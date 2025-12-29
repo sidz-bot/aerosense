@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Bundle Identifier -->
+	<key>CFBundleIdentifier</key>
+	<string>com.aerosense.app</string>
+
+	<!-- Bundle Display Name -->
+	<key>CFBundleDisplayName</key>
+	<string>AeroSense</string>
+
+	<!-- Bundle Name -->
+	<key>CFBundleName</key>
+	<string>AeroSense</string>
+
+	<!-- Bundle Version (Build) -->
+	<key>CFBundleVersion</key>
+	<string>1</string>
+
+	<!-- Version (App Store Display) -->
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+
+	<!-- Bundle Package Type -->
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<!-- Executable Name -->
+	<key>CFBundleExecutable</key>
+	<string>AeroSense</string>
+
+	<!-- Supported Platforms -->
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+
+	<!-- Minimum iOS Version -->
+	<key>MinimumOSVersion</key>
+	<string>17.0</string>
+
+	<!-- Required Device Capabilities -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+
+	<!-- Status Bar Appearance -->
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+
+	<!-- Launch Screen -->
+	<key>UILaunchScreen</key>
+	<dict/>
+
+	<!-- App Transport Security (HTTPS only in production) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Allow arbitrary loads for development -->
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<!-- In production, restrict to specific domains -->
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+
+	<!-- Background Modes for Notifications -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
+	<!-- Permissions Descriptions (Privacy) -->
+
+	<!-- Face ID / Touch ID -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>AeroSense uses Face ID to secure your account and protect your flight data.</string>
+
+	<!-- Notifications -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>AeroSense sends notifications about gate changes, delays, and connection risks for your flights.</string>
+
+	<!-- Location (for future features) -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>AeroSense uses your location to show nearby airports and provide walking directions to gates.</string>
+
+	<!-- Network (for future features) -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>AeroSense uses network connectivity to fetch real-time flight data.</string>
+
+	<!-- Scene Configuration (SwiftUI multi-window support) -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+
+	<!-- Fonts (if custom fonts are added) -->
+	<key>UIAppFonts</key>
+	<array/>
+
+	<!-- App Category -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.travel</string>
+
+	<!-- App Store Info -->
+	<key>CFBundleGetInfoString</key>
+	<string>AeroSense - Aviation Intelligence for Passengers</string>
+
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2025 AeroSense. All rights reserved.</string>
+
+</dict>
+</plist>

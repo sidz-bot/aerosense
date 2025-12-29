@@ -1,0 +1,36 @@
+# AeroSense BMAD Configuration
+# This file configures the BMad framework for the AeroSense project
+
+# Documentation Exploder - enables intelligent markdown processing
+markdownExploder: true
+
+# QA Configuration
+qa:
+  qaLocation: docs/qa
+  prd:
+  prdFile: docs/03-prd/PRD.md
+  prdVersion: v1
+  prdSharded: true
+  prdShardedLocation: docs/03-prd
+  epicFilePattern: epic-{n}*.md
+
+# Architecture Configuration
+architecture:
+  architectureFile: docs/05-architecture/architecture.md
+  architectureVersion: v1
+  architectureSharded: true
+  architectureShardedLocation: docs/05-architecture
+
+# Custom Technical Documents (none for this project)
+customTechnicalDocuments: null
+
+# Developer Configuration
+devLoadAlwaysFiles:
+  - docs/05-architecture/coding-standards.md
+  - docs/05-architecture/tech-stack.md
+  - docs/05-architecture/source-tree.md
+devDebugLog: .ai/debug-log.md
+devStoryLocation: docs/stories
+
+# Command Prefix
+slashPrefix: BMad

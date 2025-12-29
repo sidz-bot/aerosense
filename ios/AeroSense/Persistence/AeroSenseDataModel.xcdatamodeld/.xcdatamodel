@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDUser" representedClassName="CDUser" syncable="YES">
+        <attribute name="email" optional="NO" attributeType="String"/>
+        <attribute name="id" optional="NO" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="role" optional="NO" attributeType="String" defaultValueString="FREE"/>
+        <attribute name="avatarUrl" optional="YES" attributeType="String"/>
+        <attribute name="emailVerified" optional="NO" attributeType="Boolean" defaultValueString="NO"/>
+        <attribute name="notificationEnabled" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="lastLoginAt" optional="YES" attributeType="Date"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <relationship name="deviceTokens" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDDeviceToken" inverseName="user" inverseEntity="CDDeviceToken"/>
+        <relationship name="trackedFlights" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDUserFlight" inverseName="user" inverseEntity="CDUserFlight"/>
+    </entity>
+
+    <entity name="CDDeviceToken" representedClassName="CDDeviceToken" syncable="YES">
+        <attribute name="id" optional="NO" attributeType="String"/>
+        <attribute name="token" optional="NO" attributeType="String"/>
+        <attribute name="platform" optional="NO" attributeType="String"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <relationship name="user" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="CDUser" inverseName="deviceTokens" inverseEntity="CDUser"/>
+    </entity>
+
+    <entity name="CDAirport" representedClassName="CDAirport" syncable="YES">
+        <attribute name="id" optional="NO" attributeType="String"/>
+        <attribute name="code" optional="NO" attributeType="String"/>
+        <attribute name="name" optional="NO" attributeType="String"/>
+        <attribute name="city" optional="NO" attributeType="String"/>
+        <attribute name="country" optional="NO" attributeType="String"/>
+        <attribute name="latitude" optional="NO" attributeType="Double" defaultValueString="0.0"/>
+        <attribute name="longitude" optional="NO" attributeType="Double" defaultValueString="0.0"/>
+        <attribute name="timezone" optional="NO" attributeType="String"/>
+        <relationship name="departingFlights" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDFlight" inverseName="origin" inverseEntity="CDFlight"/>
+        <relationship name="arrivingFlights" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDFlight" inverseName="destination" inverseEntity="CDFlight"/>
+    </entity>
+
+    <entity name="CDFlight" representedClassName="CDFlight" syncable="YES">
+        <attribute name="id" optional="NO" attributeType="String"/>
+        <attribute name="airlineCode" optional="NO" attributeType="String"/>
+        <attribute name="airlineName" optional="NO" attributeType="String"/>
+        <attribute name="flightNumber" optional="NO" attributeType="String"/>
+        <attribute name="scheduledDeparture" optional="NO" attributeType="String"/>
+        <attribute name="scheduledArrival" optional="NO" attributeType="String"/>
+        <attribute name="estimatedDeparture" optional="YES" attributeType="String"/>
+        <attribute name="estimatedArrival" optional="YES" attributeType="String"/>
+        <attribute name="actualDeparture" optional="YES" attributeType="String"/>
+        <attribute name="actualArrival" optional="YES" attributeType="String"/>
+        <attribute name="departureGate" optional="YES" attributeType="String"/>
+        <attribute name="arrivalGate" optional="YES" attributeType="String"/>
+        <attribute name="terminal" optional="YES" attributeType="String"/>
+        <attribute name="baggageClaim" optional="YES" attributeType="String"/>
+        <attribute name="status" optional="NO" attributeType="String" defaultValueString="SCHEDULED"/>
+        <attribute name="delayMinutes" optional="NO" attributeType="Integer" defaultValueString="0"/>
+        <attribute name="aircraftType" optional="YES" attributeType="String"/>
+        <attribute name="flightDistance" optional="YES" attributeType="Integer"/>
+        <attribute name="lastFetchedAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <relationship name="origin" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="CDAirport" inverseName="departingFlights" inverseEntity="CDAirport"/>
+        <relationship name="destination" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="CDAirport" inverseName="arrivingFlights" inverseEntity="CDAirport"/>
+        <relationship name="trackedBy" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDUserFlight" inverseName="flight" inverseEntity="CDUserFlight"/>
+    </entity>
+
+    <entity name="CDUserFlight" representedClassName="CDUserFlight" syncable="YES">
+        <attribute name="id" optional="NO" attributeType="String"/>
+        <attribute name="isPrimary" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="notificationEnabled" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="gateChangeAlerts" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="delayAlerts" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="boardingAlerts" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="connectionRiskAlerts" optional="NO" attributeType="Boolean" defaultValueString="YES"/>
+        <attribute name="connectionRisk" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <attribute name="updatedAt" optional="NO" attributeType="Date" defaultValueString="now"/>
+        <relationship name="user" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="CDUser" inverseName="trackedFlights" inverseEntity="CDUser"/>
+        <relationship name="flight" optional="NO" maxCount="1" deletionRule="Nullify" destinationEntity="CDFlight" inverseName="trackedBy" inverseEntity="CDFlight"/>
+    </entity>
+</model>
