@@ -27,7 +27,7 @@ class DatabaseClient {
 
       // Log queries in development for debugging
       if (process.env.NODE_ENV === 'development') {
-        this.instance.$use(async (params, next) => {
+        this.instance.$use(async (params: any, next: (params: any) => Promise<any>) => {
           const before = Date.now();
           const result = await next(params);
           const after = Date.now();

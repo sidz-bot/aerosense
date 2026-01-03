@@ -18,11 +18,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Generate Prisma Client FIRST (needed for TypeScript types)
+RUN npx prisma generate
+
 # Build TypeScript
 RUN npm run build
-
-# Generate Prisma Client
-RUN npx prisma generate
 
 # =============================================================================
 # STAGE 2: Production Runtime
