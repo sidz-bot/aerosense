@@ -25,16 +25,20 @@ if (isProduction && !isTest) {
   }
 }
 
-// Parse CORS origins - always require explicit configuration in production
-const parseCorsOrigin = (): string | string[] => {
+// Parse CORS origins - flexible for Railway/PaaS deployments
+const parseCorsOrigin = (): string | string[] | boolean => {
   const corsOrigin = process.env.CORS_ORIGIN;
 
   if (!corsOrigin) {
     if (isProduction) {
-      throw new Error(
-        'CRITICAL: CORS_ORIGIN must be set in production. ' +
-        'Use comma-separated list of allowed origins (e.g., "https://aerosense.app,https://www.aerosense.app")'
-      );
+      // For Railway and similar PaaS: allow Railway domains or fallback to wildcard
+      const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+      if (railwayDomain) {
+        return [`https://${railwayDomain}`];
+      }
+      // Fallback: allow all origins (use "*" for CORS wildcard)
+      // Security note: For production with authentication, you should set CORS_ORIGIN explicitly
+      return "*";
     }
     // Development: allow localhost with port
     return ['http://localhost:3000', 'http://localhost:8080', 'http://127.0.0.1:3000'];
