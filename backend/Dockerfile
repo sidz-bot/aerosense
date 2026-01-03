@@ -4,7 +4,7 @@
 # =============================================================================
 # STAGE 1: Builder
 # =============================================================================
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -27,14 +27,14 @@ RUN npm run build
 # =============================================================================
 # STAGE 2: Production Runtime
 # =============================================================================
-FROM node:20-alpine AS runtime
+FROM node:20-slim AS runtime
 
 # Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+RUN apt-get update && apt-get install -y dumb-init && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN addgroup -g 1001 -S aerosense && \
-    adduser -S -u 1001 -G aerosense aerosense
+RUN groupadd -g 1001 aerosense && \
+    useradd -u 1001 -g aerosense -s /bin/bash aerosense
 
 # Set working directory
 WORKDIR /app
