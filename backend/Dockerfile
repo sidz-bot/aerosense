@@ -12,6 +12,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Install system dependencies (OpenSSL for Prisma)
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Install all dependencies (including devDependencies for build)
 RUN npm install
 
@@ -29,8 +32,8 @@ RUN npm run build
 # =============================================================================
 FROM node:20-slim AS runtime
 
-# Install dumb-init for proper signal handling
-RUN apt-get update && apt-get install -y dumb-init && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (OpenSSL for Prisma)
+RUN apt-get update && apt-get install -y dumb-init openssl && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN groupadd -g 1001 aerosense && \
