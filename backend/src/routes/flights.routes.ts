@@ -184,6 +184,41 @@ export async function flightRoutes(fastify: FastifyInstance) {
   });
 
   /**
+   * DELETE /api/v1/flights/:id/track
+   * Untrack a flight for the authenticated user
+   */
+  fastify.delete('/:id/track', {
+    onRequest: [fastify.authenticate],
+  }, async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      const userId = (request as any).user?.sub;
+
+      if (!userId) {
+        const errResponse: ApiError = {
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'User authentication required',
+          },
+        };
+        return reply.code(401).send(errResponse);
+      }
+
+      await flightService.untrackFlight(userId, id);
+
+      return reply.code(204).send();
+    } catch (error) {
+      const errResponse: ApiError = {
+        error: {
+          code: 'UNTRACK_ERROR',
+          message: error instanceof Error ? error.message : 'Failed to untrack flight',
+        },
+      };
+      return reply.code(400).send(errResponse);
+    }
+  });
+
+  /**
    * GET /api/v1/flights/tracked
    * Get all tracked flights for the authenticated user
    */

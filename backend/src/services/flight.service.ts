@@ -4,6 +4,12 @@
  */
 
 import { mockDataService } from './mock-data.service';
+import {
+  trackFlight as dbTrackFlight,
+  untrackFlight as dbUntrackFlight,
+  getUserTrackedFlights,
+} from '../utils/database-helpers';
+import { logger } from '../utils/logger';
 import type {
   Flight,
   FlightSearchQuery,
@@ -11,7 +17,7 @@ import type {
   Connection,
   RiskFactor,
 } from '../types/flight.types';
-import { ConnectionRiskLevel } from '../types/flight.types';
+import { ConnectionRiskLevel, FlightStatus } from '../types/flight.types';
 
 export class FlightService {
   /**
@@ -184,41 +190,109 @@ export class FlightService {
   }
 
   /**
-   * Get tracked flights for a user (mock implementation)
+   * Get tracked flights for a user
+   * Returns flights from the database that the user is tracking
    */
-  async getTrackedFlights(_userId: string): Promise<Flight[]> {
-    // In real implementation, this would query the database
-    // For now, return a subset of mock flights
-    const allFlights = await mockDataService.getAllFlights();
-    return allFlights.slice(0, 3);
+  async getTrackedFlights(userId: string): Promise<Flight[]> {
+    const userFlights = await getUserTrackedFlights(userId);
+
+    // Map database results to Flight type
+    return userFlights.map((uf) => ({
+      id: uf.flight.id,
+      airlineCode: uf.flight.airlineCode,
+      airlineName: uf.flight.airlineName,
+      flightNumber: uf.flight.flightNumber,
+      route: {
+        origin: {
+          code: uf.flight.origin.code,
+          name: uf.flight.origin.name,
+          city: uf.flight.origin.city,
+          country: uf.flight.origin.country,
+          gate: uf.flight.departureGate || undefined,
+          terminal: uf.flight.terminal || undefined,
+        },
+        destination: {
+          code: uf.flight.destination.code,
+          name: uf.flight.destination.name,
+          city: uf.flight.destination.city,
+          country: uf.flight.destination.country,
+          gate: uf.flight.arrivalGate || undefined,
+          terminal: uf.flight.terminal || undefined,
+        },
+      },
+      times: {
+        scheduledDeparture: uf.flight.scheduledDeparture,
+        scheduledArrival: uf.flight.scheduledArrival,
+        estimatedDeparture: uf.flight.estimatedDeparture || undefined,
+        estimatedArrival: uf.flight.estimatedArrival || undefined,
+        actualDeparture: uf.flight.actualDeparture || undefined,
+        actualArrival: uf.flight.actualArrival || undefined,
+      },
+      status: this.mapDbStatusToFlightStatus(uf.flight.status),
+      delayMinutes: uf.flight.delayMinutes,
+      aircraft: uf.flight.aircraftType ? { type: uf.flight.aircraftType } : undefined,
+      baggage: uf.flight.baggageClaim ? { claim: uf.flight.baggageClaim } : undefined,
+      lastUpdated: uf.flight.updatedAt.toISOString(),
+    }));
   }
 
   /**
-   * Track a flight for a user (mock implementation)
+   * Map database status enum to FlightStatus enum
    */
-  async trackFlight(_userId: string, flightId: string): Promise<Flight> {
-    // In real implementation, this would:
-    // 1. Validate flight exists
-    // 2. Add to user's tracked flights in database
-    // 3. Update ingestion priority queue
-    // 4. Subscribe to notifications
+  private mapDbStatusToFlightStatus(status: string): FlightStatus {
+    const statusMap: Record<string, FlightStatus> = {
+      SCHEDULED: FlightStatus.SCHEDULED,
+      DELAYED: FlightStatus.DELAYED,
+      IN_AIR: FlightStatus.IN_AIR,
+      LANDED: FlightStatus.LANDED,
+      CANCELED: FlightStatus.CANCELED,
+      BOARDING: FlightStatus.BOARDING,
+      DEPARTED: FlightStatus.DEPARTED,
+      DIVERTED: FlightStatus.IN_AIR, // Map diverted to in_air for display
+    };
+    return statusMap[status] || FlightStatus.SCHEDULED;
+  }
 
+  /**
+   * Track a flight for a user
+   * Validates flight exists and persists tracking relationship to database
+   */
+  async trackFlight(userId: string, flightId: string): Promise<Flight> {
+    // 1. Validate flight exists
     const flight = await this.getFlight(flightId);
 
-    // TODO: Implement actual tracking logic
+    // 2. Add to user's tracked flights in database
+    // Uses upsert pattern to handle duplicate tracking gracefully
+    try {
+      await dbTrackFlight(userId, flightId);
+      logger.info({ userId, flightId }, 'Flight tracked successfully');
+    } catch (error: any) {
+      // Handle unique constraint violation (already tracking)
+      if (error?.code === 'P2002') {
+        logger.info({ userId, flightId }, 'Flight already tracked, returning existing');
+      } else {
+        throw error;
+      }
+    }
+
+    // Note: Ingestion priority queue update will be implemented in Phase 4
+    // Note: Notification subscription will be implemented in Phase 5
+
     return flight;
   }
 
   /**
    * Untrack a flight for a user
+   * Removes the tracking relationship from the database
    */
-  async untrackFlight(_userId: string, _flightId: string): Promise<void> {
-    // In real implementation, this would:
+  async untrackFlight(userId: string, flightId: string): Promise<void> {
     // 1. Remove from user's tracked flights
-    // 2. Update ingestion priority
-    // 3. Unsubscribe from notifications
+    await dbUntrackFlight(userId, flightId);
 
-    // TODO: Implement actual untracking logic
+    logger.info({ userId, flightId }, 'Flight untracked successfully');
+
+    // Note: Ingestion priority update will be implemented in Phase 4
+    // Note: Notification unsubscription will be implemented in Phase 5
   }
 }
 

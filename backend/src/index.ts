@@ -12,6 +12,7 @@ import jwt from '@fastify/jwt';
 import { config } from './config';
 import { flightRoutes } from './routes/flights.routes';
 import { authRoutes } from './routes/auth.routes';
+import { notificationRoutes } from './routes/notifications.routes';
 
 // ============================================================================
 // CREATE FASTIFY INSTANCE
@@ -74,7 +75,7 @@ fastify.register(swagger, {
     tags: [
       { name: 'flights', description: 'Flight search and tracking endpoints' },
       { name: 'auth', description: 'Authentication endpoints' },
-      { name: 'users', description: 'User management endpoints' },
+      { name: 'notifications', description: 'Device token and notification history endpoints' },
     ],
     components: {
       securitySchemes: {
@@ -120,6 +121,7 @@ fastify.get('/health', async () => {
 fastify.register(async function (instance) {
   instance.register(flightRoutes, { prefix: '/flights' });
   instance.register(authRoutes);
+  instance.register(notificationRoutes, { prefix: '/notifications' });
 }, { prefix: '/api/v1' });
 
 // ============================================================================

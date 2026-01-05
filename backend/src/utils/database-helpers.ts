@@ -264,6 +264,28 @@ export async function registerDeviceToken(
 }
 
 /**
+ * Unregister (delete) device token for a user
+ */
+export async function unregisterDeviceToken(userId: string, token: string) {
+  return db.deviceToken.deleteMany({
+    where: {
+      userId,
+      token,
+    },
+  });
+}
+
+/**
+ * Get all device tokens for a user
+ */
+export async function getUserDeviceTokens(userId: string) {
+  return db.deviceToken.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+/**
  * Create notification record
  */
 export async function createNotification(params: {
