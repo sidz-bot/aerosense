@@ -107,6 +107,14 @@ export const config = {
     prettyPrint: process.env.NODE_ENV !== 'production',
   },
 
+  // Retry Configuration (PHASE 6)
+  retry: {
+    maxAttempts: parseInt(process.env.RETRY_MAX_ATTEMPTS || '3', 10),
+    initialDelayMs: parseInt(process.env.RETRY_INITIAL_DELAY_MS || '1000', 10),
+    maxDelayMs: parseInt(process.env.RETRY_MAX_DELAY_MS || '10000', 10),
+    backoffMultiplier: parseFloat(process.env.RETRY_BACKOFF_MULTIPLIER || '2'),
+  },
+
   // CORS - Security: No wildcard in production
   cors: {
     origin: parseCorsOrigin(),

@@ -10,6 +10,7 @@
 import { cacheService, CacheKeys } from '../utils/redis';
 import { logger } from '../utils/logger';
 import { config } from '../config';
+import { retry, httpRetryableErrors } from '../utils/retry';
 import type { Flight } from '../types/flight.types';
 import { FlightStatus } from '../types/flight.types';
 
@@ -177,29 +178,52 @@ export class FlightAwareService {
   }
 
   /**
-   * Fetch from FlightAware API
+   * Fetch from FlightAware API with retry logic
+   * PHASE 6: Added retry with exponential backoff for external API calls
    */
   private async fetchFromFlightAware(endpoint: string): Promise<FlightAwareFlightResponse> {
     const url = `${this.config.baseUrl}${endpoint}`;
 
-    const response = await fetch(url, {
-      headers: {
-        'x-apikey': this.config.apiKey,
-        'Accept': 'application/json',
+    // Use retry with exponential backoff
+    const result = await retry(async () => {
+      const response = await fetch(url, {
+        headers: {
+          'x-apikey': this.config.apiKey,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('FlightAware API rate limit exceeded (429)');
+        }
+        if (response.status === 401) {
+          throw new Error('FlightAware API key invalid (401)');
+        }
+        // Include status code in error message for retry detection
+        throw new Error(`FlightAware API error: ${response.status} ${response.statusText}`);
+      }
+
+      return response.json();
+    }, {
+      maxAttempts: config.retry?.maxAttempts || 3,
+      initialDelayMs: config.retry?.initialDelayMs || 1000,
+      backoffMultiplier: config.retry?.backoffMultiplier || 2,
+      retryableErrors: httpRetryableErrors,
+      onRetry: (attempt, error) => {
+        logger.warn(
+          { attempt, endpoint, error },
+          'FlightAware: retrying API request'
+        );
       },
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        throw new Error('FlightAware API rate limit exceeded');
-      }
-      if (response.status === 401) {
-        throw new Error('FlightAware API key invalid');
-      }
-      throw new Error(`FlightAware API error: ${response.status} ${response.statusText}`);
-    }
+    logger.debug(
+      { endpoint, attempts: result.attempts, totalDelayMs: result.totalDelayMs },
+      'FlightAware: API request completed'
+    );
 
-    return response.json();
+    return result.data;
   }
 
   /**

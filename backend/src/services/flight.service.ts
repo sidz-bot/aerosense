@@ -93,6 +93,29 @@ export class FlightService {
       outgoing.route.origin.terminal,
     );
 
+    // Check for critical conditions first
+    if (incoming.status === FlightStatus.CANCELED) {
+      return {
+        id: `conn_${incomingFlightId}_${outgoingFlightId}`,
+        incomingFlight: incoming,
+        outgoingFlight: outgoing,
+        risk: {
+          level: ConnectionRiskLevel.CRITICAL,
+          bufferMinutes: 0,
+          factors: [
+            {
+              type: 'DELAY',
+              description: 'Incoming flight canceled',
+              impact: 'NEGATIVE',
+              weight: 1.0,
+            },
+          ],
+          confidence: 1.0,
+          calculatedAt: new Date().toISOString(),
+        },
+      };
+    }
+
     // Calculate effective buffer
     const effectiveBuffer = bufferMinutes - currentDelay - gateChangeTime;
 

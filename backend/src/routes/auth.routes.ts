@@ -16,6 +16,7 @@
 
 import type { FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
+import { freeRateLimiter } from '../middleware/rate-limit.middleware';
 import {
   registerUser,
   loginUser,
@@ -40,15 +41,17 @@ import { logger } from '../utils/logger';
 // =============================================================================
 
 export async function authRoutes(fastify: FastifyInstance) {
-  // ===========================================================================
-  // Public Routes
-  // ===========================================================================
+  // PHASE 6: Apply rate limiting to public auth endpoints
+  // (login and register need stricter rate limiting for security)
 
   /**
    * POST /auth/register
    * Register a new user
+   * PHASE 6: Rate limited (prevent abuse)
    */
-  fastify.post('/auth/register', async (request, reply) => {
+  fastify.post('/auth/register', {
+    onRequest: [freeRateLimiter],
+  }, async (request, reply) => {
     try {
       const input = registerSchema.parse(request.body);
       const result = await registerUser(input);
@@ -94,8 +97,11 @@ export async function authRoutes(fastify: FastifyInstance) {
   /**
    * POST /auth/login
    * Login with email/password
+   * PHASE 6: Rate limited (prevent brute force)
    */
-  fastify.post('/auth/login', async (request, reply) => {
+  fastify.post('/auth/login', {
+    onRequest: [freeRateLimiter],
+  }, async (request, reply) => {
     try {
       const input = loginSchema.parse(request.body);
       const result = await loginUser(input);
@@ -141,8 +147,11 @@ export async function authRoutes(fastify: FastifyInstance) {
   /**
    * POST /auth/refresh
    * Refresh access token using refresh token
+   * PHASE 6: Rate limited
    */
-  fastify.post('/auth/refresh', async (request, reply) => {
+  fastify.post('/auth/refresh', {
+    onRequest: [freeRateLimiter],
+  }, async (request, reply) => {
     try {
       const { refreshToken } = refreshTokenSchema.parse(request.body);
       const result = await refreshAccessToken(refreshToken);

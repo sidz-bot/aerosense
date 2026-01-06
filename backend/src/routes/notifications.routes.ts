@@ -11,9 +11,12 @@
  *
  * Note: APNS delivery is PAUSED - no iOS client available.
  * These endpoints only handle database persistence.
+ *
+ * PHASE 6: Added rate limiting to all endpoints
  */
 
 import type { FastifyInstance } from 'fastify';
+import { createRoleBasedRateLimiter } from '../middleware/rate-limit.middleware';
 import {
   registerDeviceToken,
   unregisterDeviceToken,
@@ -28,19 +31,23 @@ import { logger } from '../utils/logger';
 // =============================================================================
 
 export async function notificationRoutes(fastify: FastifyInstance) {
+  // PHASE 6: Apply role-based rate limiting to all notification routes
+  const rateLimiter = createRoleBasedRateLimiter();
+
   // ===========================================================================
-  // All routes require authentication
+  // All routes require authentication + rate limiting
   // ===========================================================================
 
   /**
    * POST /api/v1/notifications/register
    * Register a device token for push notifications
+   * PHASE 6: Rate limited + authenticated
    *
    * Request body: { token: string, platform: 'ios' | 'android' }
    * Response: { id, token, platform, createdAt }
    */
   fastify.post('/register', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const userId = (request as any).user?.sub;
@@ -108,12 +115,13 @@ export async function notificationRoutes(fastify: FastifyInstance) {
   /**
    * DELETE /api/v1/notifications/register
    * Unregister a device token
+   * PHASE 6: Rate limited + authenticated
    *
    * Request body: { token: string }
    * Response: 204 No Content
    */
   fastify.delete('/register', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const userId = (request as any).user?.sub;
@@ -160,11 +168,12 @@ export async function notificationRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/v1/notifications/tokens
    * Get all registered device tokens for the user
+   * PHASE 6: Rate limited + authenticated
    *
    * Response: { tokens: [{ id, token, platform, createdAt }] }
    */
   fastify.get('/tokens', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const userId = (request as any).user?.sub;
@@ -205,12 +214,13 @@ export async function notificationRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/v1/notifications/history
    * Get notification history for the user
+   * PHASE 6: Rate limited + authenticated
    *
    * Query params: limit (default: 20), offset (default: 0)
    * Response: { notifications: [...], total: number }
    */
   fastify.get('/history', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const userId = (request as any).user?.sub;

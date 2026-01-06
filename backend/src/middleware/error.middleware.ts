@@ -2,6 +2,7 @@
  * Error Handling Middleware
  *
  * Global error handlers for consistent error responses
+ * PHASE 6: Enhanced with 4xx/5xx classification for observability
  */
 
 import type { FastifyError, FastifyRequest, FastifyReply } from 'fastify';
@@ -28,26 +29,33 @@ interface ErrorResponse {
 // =============================================================================
 
 /**
- * Global error handler
+ * Global error handler with 4xx/5xx classification (PHASE 6)
  */
 export function errorHandler(
   error: FastifyError,
   request: FastifyRequest,
   reply: FastifyReply
 ): void {
-  // Log error
+  const statusCode = error.statusCode || 500;
+
+  // Classify error type for observability
+  const errorClass = classifyError(statusCode);
+
+  // Log error with classification
   logger.error({
     error: {
       message: error.message,
       code: error.code,
-      statusCode: error.statusCode,
+      statusCode: statusCode,
+      classification: errorClass, // PHASE 6: 4xx vs 5xx
     },
     request: {
       method: request.method,
       url: request.url,
+      requestId: request.id, // PHASE 6: Request ID for tracing
       headers: request.headers,
     },
-  }, 'Request error');
+  }, `Request error - ${errorClass}`); // PHASE 6: Classification in log message
 
   // Handle different error types
   if (error instanceof ZodError) {
@@ -86,7 +94,6 @@ export function errorHandler(
   }
 
   // Default error response
-  const statusCode = error.statusCode || 500;
   const response: ErrorResponse = {
     success: false,
     error: {
@@ -101,6 +108,20 @@ export function errorHandler(
   }
 
   reply.status(statusCode).send(response);
+}
+
+/**
+ * Classify error by status code (PHASE 6)
+ * @returns '4xx_client_error' | '5xx_server_error' | 'unknown'
+ */
+function classifyError(statusCode: number): string {
+  if (statusCode >= 400 && statusCode < 500) {
+    return '4xx_client_error';
+  }
+  if (statusCode >= 500 && statusCode < 600) {
+    return '5xx_server_error';
+  }
+  return 'unknown';
 }
 
 /**

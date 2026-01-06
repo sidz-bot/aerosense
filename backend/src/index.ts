@@ -16,6 +16,8 @@ import { notificationRoutes } from './routes/notifications.routes';
 import { flightPollerService } from './services/flight-poller.service';
 import { airportService } from './services/airport.service';
 import { notificationQueueService } from './services/notification-queue.service';
+import { requestIdPlugin } from './middleware/request-id.middleware';
+import { requestLoggerPlugin } from './middleware/request-logger.middleware';
 
 // ============================================================================
 // CREATE FASTIFY INSTANCE
@@ -51,6 +53,12 @@ fastify.register(cors, {
 fastify.register(jwt, {
   secret: config.jwtSecret,
 });
+
+// PHASE 6: Request ID middleware - adds X-Request-ID header
+fastify.register(requestIdPlugin);
+
+// PHASE 6: Request logging middleware - structured JSON logging
+fastify.register(requestLoggerPlugin);
 
 // Authentication decorator - adds request.authenticate hook
 fastify.decorate('authenticate', async function (request: any, reply: any) {
@@ -201,22 +209,43 @@ async function start() {
   }
 }
 
-// Handle graceful shutdown
-process.on('SIGINT', async () => {
-  fastify.log.info('Shutting down gracefully...');
-  flightPollerService.stop();
-  notificationQueueService.stop();
-  await fastify.close();
-  process.exit(0);
-});
+// Handle graceful shutdown (PHASE 6: Enhanced with timeout and better logging)
+const shutdownTimeoutMs = 10000; // 10 seconds max for graceful shutdown
 
-process.on('SIGTERM', async () => {
-  fastify.log.info('Shutting down gracefully...');
+async function gracefulShutdown(signal: string): Promise<void> {
+  const startTime = Date.now();
+
+  fastify.log.info({ signal }, 'PHASE 6: Initiating graceful shutdown...');
+
+  // Create shutdown timeout
+  const timeoutPromise = new Promise<void>((_, reject) => {
+    setTimeout(() => reject(new Error('Shutdown timeout')), shutdownTimeoutMs);
+  });
+
+  try {
+    // Stop accepting new connections
+    await Promise.race([
+      fastify.close(),
+      timeoutPromise,
+    ]);
+    fastify.log.info('HTTP server closed');
+  } catch (error) {
+    fastify.log.error({ error }, 'Error closing HTTP server');
+  }
+
+  // Stop background services
   flightPollerService.stop();
   notificationQueueService.stop();
-  await fastify.close();
+  fastify.log.info('Background services stopped');
+
+  const duration = Date.now() - startTime;
+  fastify.log.info({ durationMs: duration }, 'PHASE 6: Graceful shutdown completed');
+
   process.exit(0);
-});
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 // Start the server
 start();

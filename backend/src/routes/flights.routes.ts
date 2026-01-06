@@ -1,18 +1,26 @@
 /**
  * Flight Routes
  * HTTP endpoints for flight operations
+ * PHASE 6: Added rate limiting to all public endpoints
  */
 
 import { FastifyInstance } from 'fastify';
 import { flightService } from '../services/flight.service';
+import { createRoleBasedRateLimiter } from '../middleware/rate-limit.middleware';
 import type { FlightSearchQuery, ApiResponse, ApiError } from '../types/flight.types';
 
 export async function flightRoutes(fastify: FastifyInstance) {
+  // PHASE 6: Apply role-based rate limiting to all flight routes
+  const rateLimiter = createRoleBasedRateLimiter();
+
   /**
    * GET /api/v1/flights/search
    * Search for flights by number or route
+   * PHASE 6: Rate limited
    */
-  fastify.get('/search', async (request, reply) => {
+  fastify.get('/search', {
+    onRequest: [rateLimiter],
+  }, async (request, reply) => {
     try {
       const query = request.query as Record<string, string>;
 
@@ -66,8 +74,11 @@ export async function flightRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/v1/flights/:id
    * Get a specific flight by ID
+   * PHASE 6: Rate limited
    */
-  fastify.get('/:id', async (request, reply) => {
+  fastify.get('/:id', {
+    onRequest: [rateLimiter],
+  }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
 
@@ -101,8 +112,11 @@ export async function flightRoutes(fastify: FastifyInstance) {
    * GET /api/v1/flights/:id/connections
    * Get connection risk analysis for a flight
    * Query params: outgoingFlightId
+   * PHASE 6: Rate limited
    */
-  fastify.get('/:id/connections', async (request, reply) => {
+  fastify.get('/:id/connections', {
+    onRequest: [rateLimiter],
+  }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
       const { outgoingFlightId } = request.query as { outgoingFlightId?: string };
@@ -143,9 +157,10 @@ export async function flightRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/v1/flights/:id/track
    * Track a flight for the authenticated user
+   * PHASE 6: Rate limited + authenticated
    */
   fastify.post('/:id/track', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
@@ -186,9 +201,10 @@ export async function flightRoutes(fastify: FastifyInstance) {
   /**
    * DELETE /api/v1/flights/:id/track
    * Untrack a flight for the authenticated user
+   * PHASE 6: Rate limited + authenticated
    */
   fastify.delete('/:id/track', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
@@ -221,9 +237,10 @@ export async function flightRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/v1/flights/tracked
    * Get all tracked flights for the authenticated user
+   * PHASE 6: Rate limited + authenticated
    */
   fastify.get('/tracked', {
-    onRequest: [fastify.authenticate],
+    onRequest: [rateLimiter, fastify.authenticate],
   }, async (request, reply) => {
     try {
       const userId = (request as any).user?.sub;

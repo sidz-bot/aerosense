@@ -117,6 +117,14 @@ class NotificationQueueService {
   }
 
   /**
+   * Clear the queue (for testing purposes)
+   */
+  clear(): void {
+    this.queue = [];
+    this.concurrentJobs = 0;
+  }
+
+  /**
    * Process pending notifications in the queue
    */
   private async processQueue(): Promise<void> {
