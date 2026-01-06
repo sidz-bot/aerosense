@@ -3,7 +3,7 @@
  * Business logic layer for flight operations
  */
 
-import { mockDataService } from './mock-data.service';
+import { flightAwareService } from './flightaware.service';
 import {
   trackFlight as dbTrackFlight,
   untrackFlight as dbUntrackFlight,
@@ -13,7 +13,6 @@ import { logger } from '../utils/logger';
 import type {
   Flight,
   FlightSearchQuery,
-  FlightSearchResult,
   Connection,
   RiskFactor,
 } from '../types/flight.types';
@@ -23,13 +22,13 @@ export class FlightService {
   /**
    * Search flights based on query type
    */
-  async searchFlights(query: FlightSearchQuery): Promise<FlightSearchResult[]> {
+  async searchFlights(query: FlightSearchQuery): Promise<Flight[]> {
     switch (query.type) {
       case 'BY_NUMBER':
         if (!query.airlineCode || !query.flightNumber || !query.date) {
           throw new Error('Airline code, flight number, and date are required for flight number search');
         }
-        return mockDataService.searchByFlightNumber(
+        return flightAwareService.searchByFlightNumber(
           query.airlineCode,
           query.flightNumber,
           query.date,
@@ -39,7 +38,7 @@ export class FlightService {
         if (!query.originAirportCode || !query.destinationAirportCode || !query.date) {
           throw new Error('Origin, destination, and date are required for route search');
         }
-        return mockDataService.searchByRoute(
+        return flightAwareService.searchByRoute(
           query.originAirportCode,
           query.destinationAirportCode,
           query.date,
@@ -54,7 +53,7 @@ export class FlightService {
    * Get flight by ID
    */
   async getFlight(flightId: string): Promise<Flight> {
-    const flight = await mockDataService.getFlightById(flightId);
+    const flight = await flightAwareService.getFlightById(flightId);
 
     if (!flight) {
       throw new Error(`Flight not found: ${flightId}`);

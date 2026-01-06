@@ -88,6 +88,7 @@ export const config = {
   // Flight Data
   flightData: {
     refreshInterval: 60,  // seconds
+    pollingIntervalSeconds: parseInt(process.env.POLLING_INTERVAL_SECONDS || '60', 10), // Background poll interval
     maxTrackedFlights: {
       free: 5,
       premium: Infinity,

@@ -13,6 +13,9 @@ import { config } from './config';
 import { flightRoutes } from './routes/flights.routes';
 import { authRoutes } from './routes/auth.routes';
 import { notificationRoutes } from './routes/notifications.routes';
+import { flightPollerService } from './services/flight-poller.service';
+import { airportService } from './services/airport.service';
+import { notificationQueueService } from './services/notification-queue.service';
 
 // ============================================================================
 // CREATE FASTIFY INSTANCE
@@ -167,6 +170,19 @@ async function start() {
       host: config.host,
     });
 
+    // Initialize airport cache
+    await airportService.preloadCommonAirports();
+
+    // Start flight polling scheduler (Phase 4)
+    if (config.nodeEnv !== 'test') {
+      flightPollerService.start();
+    }
+
+    // Start notification queue service (Phase 5)
+    if (config.nodeEnv !== 'test') {
+      notificationQueueService.start();
+    }
+
     fastify.log.info(`
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                            ║
@@ -175,6 +191,7 @@ async function start() {
 ║     Environment: ${config.nodeEnv.padEnd(43)}║
 ║     URL: http://${config.host}:${config.port}${' '.repeat(26)}║
 ║     Docs: http://${config.host}:${config.port}/docs${' '.repeat(24)}║
+║     Polling: ${config.nodeEnv !== 'test' ? 'Active' : 'Disabled (test mode)'}${' '.repeat(35)}║
 ║                                                            ║
 ╚══════════════════════════════════════════════════════════════╝
     `);
@@ -187,12 +204,16 @@ async function start() {
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
   fastify.log.info('Shutting down gracefully...');
+  flightPollerService.stop();
+  notificationQueueService.stop();
   await fastify.close();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   fastify.log.info('Shutting down gracefully...');
+  flightPollerService.stop();
+  notificationQueueService.stop();
   await fastify.close();
   process.exit(0);
 });
