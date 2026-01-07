@@ -318,3 +318,27 @@ export async function getUserNotifications(userId: string, limit = 20) {
     take: limit,
   });
 }
+
+/**
+ * Update notification delivery status
+ * PHASE 8 - Added for APNS delivery tracking
+ */
+export async function updateNotificationDelivery(params: {
+  notificationId: string;
+  status: 'SENT' | 'DELIVERED' | 'FAILED';
+  sentAt?: Date;
+  deliveredAt?: Date;
+  failedAt?: Date;
+  failureReason?: string;
+}) {
+  return db.notification.update({
+    where: { id: params.notificationId },
+    data: {
+      status: params.status,
+      sentAt: params.sentAt,
+      deliveredAt: params.deliveredAt,
+      failedAt: params.failedAt,
+      failureReason: params.failureReason,
+    },
+  });
+}

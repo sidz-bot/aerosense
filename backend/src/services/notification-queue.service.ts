@@ -2,14 +2,19 @@
  * Notification Queue Service
  *
  * In-memory queue for processing notifications asynchronously
- * Mock delivery - logs notifications instead of sending to APNS
  *
  * PHASE 5 - Notification System (Mock Delivery Only)
+ * PHASE 8 - iOS Backend Completion (Mock-Verified APNS Integration)
+ *
+ * This service now integrates with the APNS service for proper iOS payload formatting
+ * and mock-verified delivery tracking.
  */
 
-import { createNotification } from '../utils/database-helpers';
+import { createNotification, getUserDeviceTokens, updateNotificationDelivery } from '../utils/database-helpers';
 import { logger } from '../utils/logger';
 import { NotificationType } from '@prisma/client';
+import { apnsService } from './apns.service';
+import { buildNotificationPayload } from '../types/notification.types';
 
 // =============================================================================
 // TYPES
@@ -198,12 +203,33 @@ class NotificationQueueService {
 
   /**
    * Default notification handler
-   * - Persists to database
-   * - Logs delivery (mock)
+   * PHASE 8 - Enhanced with APNS payload formatting and delivery tracking
+   *
+   * Flow:
+   * 1. Build APNS payload with proper iOS formatting
+   * 2. Persist notification to database
+   * 3. Fetch user device tokens
+   * 4. Send via APNS service (mock-verified mode)
+   * 5. Update delivery tracking
    */
   private async defaultHandler(job: NotificationJob): Promise<void> {
-    // 1. Persist notification to database
-    await createNotification({
+    // Extract flight info from data for payload building
+    const airlineCode = (job.data?.airlineCode as string) || 'UNKNOWN';
+    const flightNumber = (job.data?.flightNumber as string) || '0000';
+
+    // 1. Build APNS payload with proper iOS formatting
+    const payloadParams = buildNotificationPayload({
+      type: job.type,
+      flightId: job.flightId,
+      airlineCode,
+      flightNumber,
+      data: job.data,
+    });
+
+    const apnsPayload = apnsService.buildPayload(payloadParams);
+
+    // 2. Persist notification to database (PENDING status)
+    const notificationRecord = await createNotification({
       userId: job.userId,
       flightId: job.flightId,
       type: job.type,
@@ -212,25 +238,126 @@ class NotificationQueueService {
       data: job.data,
     });
 
-    // 2. Mock delivery - log instead of sending to APNS
     logger.info(
       {
-        notificationId: job.id,
+        notificationId: notificationRecord.id,
+        queueJobId: job.id,
         type: job.type,
         userId: job.userId,
-        title: job.title,
-        body: job.body,
-        delivery: 'MOCK',
+        status: 'PENDING',
       },
-      'NotificationQueue: [MOCK DELIVERY] Notification would be sent to device'
+      'NotificationQueue: notification persisted to database'
     );
 
-    // TODO: Phase X - Real APNS delivery
-    // await apnsService.send(job.userId, {
-    //   title: job.title,
-    //   body: job.body,
-    //   data: job.data,
-    // });
+    // 3. Fetch user device tokens
+    const deviceTokens = await getUserDeviceTokens(job.userId);
+
+    if (deviceTokens.length === 0) {
+      logger.warn(
+        {
+          notificationId: notificationRecord.id,
+          userId: job.userId,
+        },
+        'NotificationQueue: no device tokens found for user, skipping APNS send'
+      );
+
+      // Update status to indicate no devices
+      await updateNotificationDelivery({
+        notificationId: notificationRecord.id,
+        status: 'FAILED',
+        failedAt: new Date(),
+        failureReason: 'No device tokens registered',
+      });
+      return;
+    }
+
+    // 4. Send via APNS service (MOCK-VERIFIED mode)
+    logger.info(
+      {
+        notificationId: notificationRecord.id,
+        deviceCount: deviceTokens.length,
+        mode: 'MOCK-VERIFIED',
+      },
+      'NotificationQueue: sending to APNS service'
+    );
+
+    const now = new Date();
+    let allSuccessful = true;
+    let failureReason: string | undefined;
+
+    for (const deviceToken of deviceTokens) {
+      // Only send to iOS devices
+      if (deviceToken.platform !== 'ios') {
+        logger.info(
+          {
+            notificationId: notificationRecord.id,
+            platform: deviceToken.platform,
+          },
+          'NotificationQueue: skipping non-iOS device'
+        );
+        continue;
+      }
+
+      const result = await apnsService.send({
+        userId: job.userId,
+        deviceToken: deviceToken.token,
+        payload: apnsPayload,
+        priority: 10, // Send immediately
+        pushType: 'alert',
+      });
+
+      if (result.success) {
+        logger.info(
+          {
+            notificationId: notificationRecord.id,
+            deviceToken: deviceToken.token.substring(0, 16) + '...',
+            apnsId: result.apnsId,
+            payloadSize: result.payloadSize,
+            mode: result.mode,
+          },
+          'NotificationQueue: [MOCK-VERIFIED] APNS send successful'
+        );
+      } else {
+        allSuccessful = false;
+        failureReason = result.error || 'Unknown APNS error';
+        logger.error(
+          {
+            notificationId: notificationRecord.id,
+            error: failureReason,
+          },
+          'NotificationQueue: APNS send failed'
+        );
+      }
+    }
+
+    // 5. Update delivery tracking in database
+    if (allSuccessful) {
+      await updateNotificationDelivery({
+        notificationId: notificationRecord.id,
+        status: 'SENT',
+        sentAt: now,
+        // In mock mode, we mark as delivered immediately
+        // In production, this would be updated via APNS feedback service
+        deliveredAt: now,
+      });
+    } else {
+      await updateNotificationDelivery({
+        notificationId: notificationRecord.id,
+        status: 'FAILED',
+        sentAt: now,
+        failedAt: now,
+        failureReason,
+      });
+    }
+
+    logger.info(
+      {
+        notificationId: notificationRecord.id,
+        status: allSuccessful ? 'SENT' : 'FAILED',
+        devicesProcessed: deviceTokens.length,
+      },
+      'NotificationQueue: notification processing complete'
+    );
   }
 
   /**
