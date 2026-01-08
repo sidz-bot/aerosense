@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.AeroSense.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/space_4"
+    android:layout_marginVertical="@dimen/space_2"
+    android:minHeight="@dimen/card_min_height"
+    app:cardElevation="@dimen/card_elevation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_4">
+
+        <!-- Flight Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/airlineLogo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="@dimen/space_3"
+                android:background="@color/gray_200"
+                android:contentDescription="@string/flight_detail_title" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/flightNumber"
+                    style="@style/TextAppearance.Material3.BodyLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    tools:text="AA 1234" />
+
+                <TextView
+                    android:id="@+id/flightRoute"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    tools:text="SFO → JFK" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/activeBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/primary_500"
+                android:paddingHorizontal="@dimen/space_2"
+                android:paddingVertical="@dimen/space_1"
+                android:text="@string/status_on_time"
+                android:textColor="@color/surface"
+                android:textSize="@dimen/text_xs"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Flight Details -->
+        <TextView
+            android:id="@+id/departureTime"
+            style="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_3"
+            android:textColor="@color/text_primary"
+            tools:text="8:30 AM" />
+
+        <TextView
+            android:id="@+id/gateInfo"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_1"
+            android:textColor="@color/text_secondary"
+            tools:text="Gate: B22" />
+
+        <!-- Status Indicator -->
+        <LinearLayout
+            android:id="@+id/statusContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_3"
+            android:background="@color/success_light"
+            android:orientation="vertical"
+            android:padding="@dimen/space_3">
+
+            <TextView
+                android:id="@+id/statusText"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/success"
+                android:textStyle="bold"
+                tools:text="@string/connection_on_track" />
+
+            <TextView
+                android:id="@+id/statusMessage"
+                style="@style/TextAppearance.Material3.BodySmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_1"
+                android:textColor="@color/text_secondary"
+                tools:text="Your connection is on schedule" />
+
+            <TextView
+                android:id="@+id/updatedTime"
+                style="@style/TextAppearance.Material3.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_1"
+                android:textColor="@color/text_tertiary"
+                tools:text="Updated 15 sec ago" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

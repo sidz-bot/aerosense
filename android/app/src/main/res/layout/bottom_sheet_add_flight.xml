@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface"
+    android:orientation="vertical"
+    tools:context=".ui.screens.flights.AddFlightBottomSheet">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:layout_marginVertical="@dimen/space_3"
+        android:background="@color/gray_300" />
+
+    <!-- Title -->
+    <TextView
+        style="@style/TextAppearance.Material3.HeadlineSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Add a flight"
+        android:textColor="@color/text_primary" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/space_3"
+        android:background="@color/divider" />
+
+    <!-- Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/space_6">
+
+            <!-- Flight Number Input -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/space_4">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/space_2"
+                        android:gravity="center_vertical"
+                        android:text="🎫 Flight number"
+                        android:textColor="@color/text_primary" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilFlightNumber"
+                        style="@style/Widget.AeroSense.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etFlightNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="AA 1234" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- OR Divider -->
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="@dimen/space_3"
+                android:text="——— OR ———"
+                android:textColor="@color/text_secondary" />
+
+            <!-- Route Search -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRouteSearch"
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/space_4"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/space_2"
+                        android:gravity="center_vertical"
+                        android:text="✈️ Search by route"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_1"
+                        android:text="From → To, Date"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Calendar Import -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCalendarImport"
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3"
+                android:layout_marginHorizontal="@dimen/space_4"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/space_2"
+                        android:gravity="center_vertical"
+                        android:text="📅 Import from calendar"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_1"
+                        android:text="Auto-detect flights from your calendar"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

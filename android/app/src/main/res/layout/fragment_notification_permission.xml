@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ui.screens.auth.NotificationPermissionFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/space_6">
+
+        <!-- Bell Icon -->
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_notification"
+            app:tint="@color/primary_500" />
+
+        <!-- Title -->
+        <TextView
+            style="@style/TextAppearance.Material3.HeadlineMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_6"
+            android:gravity="center"
+            android:text="Stay informed during your journey"
+            android:textColor="@color/text_primary" />
+
+        <!-- Notification Types List -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_6"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_2"
+                android:text="We'll send you instant alerts for:"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/space_2"
+                android:text="• Gate changes"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/space_2"
+                android:text="• Flight delays"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/space_2"
+                android:text="• Connection risks"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/space_2"
+                android:text="• Boarding time reminders"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+
+        <!-- Customization Note -->
+        <TextView
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_6"
+            android:gravity="center"
+            android:text="You can customize these anytime in Settings."
+            android:textColor="@color/text_secondary" />
+
+        <!-- Allow Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAllow"
+            style="@style/Widget.AeroSense.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_6"
+            android:text="Allow Notifications" />
+
+        <!-- Not Now Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNotNow"
+            style="@style/Widget.AeroSense.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_3"
+            android:text="Not Now" />
+
+    </LinearLayout>
+</ScrollView>

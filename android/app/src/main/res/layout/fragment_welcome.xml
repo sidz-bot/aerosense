@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/space_6"
+    tools:context=".ui.screens.auth.WelcomeFragment">
+
+    <!-- Logo/Icon -->
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_flight"
+        app:tint="@color/primary_500" />
+
+    <!-- App Name -->
+    <TextView
+        style="@style/TextAppearance.Material3.HeadlineLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_6"
+        android:text="@string/welcome_title"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold" />
+
+    <!-- Tagline -->
+    <TextView
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_4"
+        android:gravity="center"
+        android:text="@string/welcome_tagline"
+        android:textColor="@color/text_secondary" />
+
+    <!-- Get Started Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGetStarted"
+        style="@style/Widget.AeroSense.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:text="@string/welcome_get_started" />
+
+    <!-- Sign In Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignIn"
+        style="@style/Widget.AeroSense.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_3"
+        android:text="@string/welcome_sign_in" />
+
+</LinearLayout>

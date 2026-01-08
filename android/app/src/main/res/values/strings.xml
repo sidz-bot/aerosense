@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AeroSense</string>
+
+    <!-- Navigation Tabs -->
+    <string name="nav_flights">Flights</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Auth Screens -->
+    <string name="welcome_title">AeroSense</string>
+    <string name="welcome_tagline">Never miss a gate change.\nNever worry about connections.</string>
+    <string name="welcome_get_started">Get Started</string>
+    <string name="welcome_sign_in">I already have an account</string>
+
+    <!-- Flight Screens -->
+    <string name="flights_title">My Flights</string>
+    <string name="flight_detail_title">Flight Details</string>
+    <string name="add_flight">Add Flight</string>
+    <string name="no_flights_title">No flights tracked</string>
+    <string name="no_flights_message">Add a flight to get started</string>
+
+    <!-- Empty States -->
+    <string name="empty_notifications_title">No Notifications</string>
+    <string name="empty_notifications_message">Alerts will appear here</string>
+    <string name="empty_search_title">No results found</string>
+    <string name="empty_search_message">Try a different search term</string>
+
+    <!-- Connection Risk -->
+    <string name="connection_on_track">ON TRACK</string>
+    <string name="connection_at_risk">AT RISK</string>
+    <string name="connection_critical">CRITICAL</string>
+
+    <!-- Status -->
+    <string name="status_on_time">On Time</string>
+    <string name="status_delayed">Delayed</string>
+    <string name="status_canceled">Canceled</string>
+    <string name="status_boarding">Boarding</string>
+    <string name="status_in_air">In Air</string>
+    <string name="status_landed">Landed</string>
+    <string name="status_scheduled">Scheduled</string>
+
+    <!-- Actions -->
+    <string name="action_add">Add</string>
+    <string name="action_done">Done</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_search">Search</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong</string>
+    <string name="error_network">No internet connection</string>
+    <string name="error_loading">Failed to load data</string>
+</resources>

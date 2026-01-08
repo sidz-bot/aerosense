@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Theme -->
+    <style name="Theme.AeroSense" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/primary_500</item>
+        <item name="colorPrimaryDark">@color/primary_700</item>
+        <item name="colorAccent">@color/primary_500</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- Text -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Navigation Bar -->
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Widget.AeroSense.Button" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/surface</item>
+        <item name="backgroundTint">@color/primary_500</item>
+        <item name="android:minHeight">@dimen/button_height_normal</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textSize">@dimen/text_base</item>
+    </style>
+
+    <style name="Widget.AeroSense.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/primary_500</item>
+        <item name="strokeColor">@color/primary_500</item>
+        <item name="android:minHeight">@dimen/button_height_normal</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textSize">@dimen/text_base</item>
+    </style>
+
+    <!-- TextInput Style -->
+    <style name="Widget.AeroSense.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/gray_300</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxCornerRadiusTopStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_md</item>
+        <item name="android:minHeight">@dimen/input_height</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="Widget.AeroSense.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardCornerRadius">@dimen/radius_lg</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- TopAppBar Style -->
+    <style name="Widget.AeroSense.TopAppBar" parent="Widget.Material3.AppBarLayout">
+        <item name="android:background">@color/surface</item>
+        <item name="android:elevation">@dimen/elevation_md</item>
+    </style>
+</resources>

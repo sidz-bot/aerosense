@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.screens.flights.FlightDetailFragment">
+
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="@dimen/elevation_md">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/flight_detail_title" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_4">
+
+            <!-- Connection Risk Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardConnectionStatus"
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/success_light"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        android:id="@+id/tvConnectionStatus"
+                        style="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/connection_on_track"
+                        android:textColor="@color/success"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvConnectionMessage"
+                        style="@style/TextAppearance.Material3.BodyLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:text="Your connection is on schedule. Relax, you have time."
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/tvUpdatedTime"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_1"
+                        android:text="Updated 12 sec ago"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Flight Segments List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFlightSegments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_flight_card" />
+
+            <!-- Connection Detail Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardConnectionDetail"
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/space_2"
+                        android:gravity="center_vertical"
+                        android:text="Connection Details →"
+                        android:textColor="@color/primary_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Timeline Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewTimeline"
+                style="@style/Widget.AeroSense.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="View Timeline" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Floating Action Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabTrackLive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/space_6"
+        android:contentDescription="Track Live"
+        app:srcCompat="@drawable/ic_flight" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

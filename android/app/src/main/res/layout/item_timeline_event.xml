@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/space_4"
+    android:paddingEnd="@dimen/space_4"
+    android:paddingTop="@dimen/space_3"
+    android:paddingBottom="@dimen/space_3">
+
+    <!-- Timeline Indicator (Dot + Line) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Timeline Dot -->
+        <ImageView
+            android:id="@+id/timelineDot"
+            android:layout_width="@dimen/timeline_dot_size"
+            android:layout_height="@dimen/timeline_dot_size"
+            android:src="@drawable/ic_timeline_dot_completed"
+            android:contentDescription="Timeline status indicator" />
+
+        <!-- Timeline Line -->
+        <View
+            android:id="@+id/timelineLine"
+            android:layout_width="@dimen/timeline_line_width"
+            android:layout_height="@dimen/timeline_line_height"
+            android:background="@color/divider" />
+    </LinearLayout>
+
+    <!-- Event Content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/space_3"
+        android:orientation="vertical">
+
+        <!-- Time -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvTime"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            tools:text="6:00 AM" />
+
+        <!-- Title -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvTitle"
+            style="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_1"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            tools:text="Check-in opens" />
+
+        <!-- Description (Optional) -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvDescription"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_0"
+            android:textColor="@color/text_secondary"
+            android:visibility="gone"
+            tools:text="Proceed to security checkpoint" />
+
+        <!-- Gate (Optional) -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvGate"
+            style="@style/TextAppearance.Material3.BodySmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_1"
+            android:textColor="@color/text_secondary"
+            android:visibility="gone"
+            tools:text="Gate A12" />
+
+        <!-- Status Badge -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvStatus"
+            style="@style/TextAppearance.Material3.LabelSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2"
+            tools:text="Completed" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing Scale (8px base unit) -->
+    <dimen name="space_0">0dp</dimen>
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+    <dimen name="space_3">12dp</dimen>
+    <dimen name="space_4">16dp</dimen>
+    <dimen name="space_5">20dp</dimen>
+    <dimen name="space_6">24dp</dimen>
+    <dimen name="space_8">32dp</dimen>
+    <dimen name="space_10">40dp</dimen>
+    <dimen name="space_12">48dp</dimen>
+    <dimen name="space_16">64dp</dimen>
+    <dimen name="space_20">80dp</dimen>
+
+    <!-- Border Radius -->
+    <dimen name="radius_sm">4dp</dimen>
+    <dimen name="radius_md">8dp</dimen>
+    <dimen name="radius_lg">12dp</dimen>
+    <dimen name="radius_xl">16dp</dimen>
+    <dimen name="radius_full">9999dp</dimen>
+
+    <!-- Typography -->
+    <dimen name="text_xs">11sp</dimen>
+    <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_base">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_2xl">24sp</dimen>
+    <dimen name="text_3xl">30sp</dimen>
+    <dimen name="text_4xl">36sp</dimen>
+
+    <!-- Components -->
+    <dimen name="button_height_normal">44dp</dimen>
+    <dimen name="button_height_small">36dp</dimen>
+    <dimen name="button_height_large">52dp</dimen>
+    <dimen name="icon_button_size">40dp</dimen>
+
+    <dimen name="card_min_height">140dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+
+    <dimen name="input_height">44dp</dimen>
+
+    <!-- Navigation -->
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="top_app_bar_height">56dp</dimen>
+
+    <!-- Touch Target -->
+    <dimen name="touch_target_min">44dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="elevation_sm">2dp</dimen>
+    <dimen name="elevation_md">4dp</dimen>
+    <dimen name="elevation_lg">8dp</dimen>
+
+    <!-- Timeline -->
+    <dimen name="timeline_dot_size">16dp</dimen>
+    <dimen name="timeline_line_width">2dp</dimen>
+    <dimen name="timeline_line_height">60dp</dimen>
+</resources>

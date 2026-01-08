@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="primary_500">#2196F3</color>
+    <color name="primary_600">#1E88E5</color>
+    <color name="primary_700">#1976D2</color>
+
+    <!-- Neutral Colors -->
+    <color name="gray_50">#FAFAFA</color>
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_600">#757575</color>
+    <color name="gray_700">#616161</color>
+    <color name="gray_800">#424242</color>
+    <color name="gray_900">#212121</color>
+
+    <!-- Semantic Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="success_light">#E8F5E9</color>
+    <color name="warning">#FF9800</color>
+    <color name="warning_light">#FFF3E0</color>
+    <color name="error">#F44336</color>
+    <color name="error_light">#FFEBEE</color>
+    <color name="info">#2196F3</color>
+    <color name="info_light">#E3F2FD</color>
+
+    <!-- Flight Status Colors -->
+    <color name="status_on_time">#4CAF50</color>
+    <color name="status_delayed">#FF9800</color>
+    <color name="status_canceled">#D32F2F</color>
+    <color name="status_boarding">#2196F3</color>
+    <color name="status_in_air">#2196F3</color>
+    <color name="status_landed">#4CAF50</color>
+    <color name="status_scheduled">#9E9E9E</color>
+
+    <!-- Connection Risk Colors -->
+    <color name="risk_on_track">#4CAF50</color>
+    <color name="risk_at_risk">#FF9800</color>
+    <color name="risk_high_risk">#FF5722</color>
+    <color name="risk_critical">#D32F2F</color>
+
+    <!-- Background -->
+    <color name="background">#FAFAFA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F5F5</color>
+
+    <!-- Text -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_tertiary">#9E9E9E</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Divider -->
+    <color name="divider">#E0E0E0</color>
+
+    <!-- Icons -->
+    <color name="icon_primary">#212121</color>
+    <color name="icon_secondary">#757575</color>
+    <color name="icon_disabled">#E0E0E0</color>
+</resources>

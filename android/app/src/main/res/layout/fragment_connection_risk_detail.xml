@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.screens.flights.ConnectionRiskDetailFragment">
+
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="@dimen/elevation_md">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="Connection Risk" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_4">
+
+            <!-- Risk Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/warning_light"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        android:id="@+id/tvRiskStatus"
+                        style="@style/TextAppearance.Material3.HeadlineMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/connection_at_risk"
+                        android:textColor="@color/warning"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvRiskMessage"
+                        style="@style/TextAppearance.Material3.BodyLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:text="Your connection is tight. First flight delay could cause you to miss your connecting flight."
+                        android:textColor="@color/text_primary" />
+
+                    <!-- Risk Factors -->
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_3"
+                        android:text="Risk factors:"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvRiskFactor1"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• First flight running 25 min late"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvRiskFactor2"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• Connection time: 55 min (minimum: 45 min)"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvRiskFactor3"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="• Gates: B22 → F12 (5 min walk)"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Alternative Flights Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Alternative flights if you miss your connection"
+                        android:textColor="@color/text_primary" />
+
+                    <!-- Alternative Flight 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_3"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="American Airlines 2105"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Departs: 3:15 PM • Arrives: 6:42 PM • Gate: G8"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCheckAvailability1"
+                        style="@style/Widget.AeroSense.Button.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:text="Check availability" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tips Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.AeroSense.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_4">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💡 Tips for making your connection"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_2"
+                        android:text="• Move toward the front of the plane during deplaning\n• Check the departure board for any gate changes\n• If you're running late, let a gate agent know"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Mark as Safe Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMarkSafe"
+                style="@style/Widget.AeroSense.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="Mark as Safe ✓" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
