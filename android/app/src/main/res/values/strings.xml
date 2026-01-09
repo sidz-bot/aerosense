@@ -49,6 +49,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_search">Search</string>
     <string name="action_retry">Retry</string>
+    <string name="dismiss">Dismiss</string>
 
     <!-- Errors -->
     <string name="error_generic">Something went wrong</string>

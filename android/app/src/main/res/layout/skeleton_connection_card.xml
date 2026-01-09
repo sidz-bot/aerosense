@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.AeroSense.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/space_4"
+    android:layout_marginVertical="@dimen/space_2"
+    android:minHeight="@dimen/card_min_height"
+    app:cardElevation="@dimen/card_elevation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_100"
+        android:orientation="vertical"
+        android:padding="@dimen/space_4">
+
+        <!-- Skeleton Risk Status Title -->
+        <View
+            android:id="@+id/skeletonRiskStatus"
+            android:layout_width="104dp"
+            android:layout_height="24dp"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Risk Message -->
+        <View
+            android:id="@+id/skeletonRiskMessage"
+            android:layout_width="280dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="@dimen/space_2"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Risk Factors Section -->
+        <View
+            android:id="@+id/skeletonRiskFactorsLabel"
+            android:layout_width="88dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="@dimen/space_3"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Risk Factor 1 -->
+        <View
+            android:id="@+id/skeletonRiskFactor1"
+            android:layout_width="240dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="@dimen/space_2"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Risk Factor 2 -->
+        <View
+            android:id="@+id/skeletonRiskFactor2"
+            android:layout_width="224dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="@dimen/space_1"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Risk Factor 3 -->
+        <View
+            android:id="@+id/skeletonRiskFactor3"
+            android:layout_width="184dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="@dimen/space_1"
+            android:background="@color/gray_200" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

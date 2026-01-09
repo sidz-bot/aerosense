@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Network Offline Banner -->
+    <LinearLayout
+        android:id="@+id/networkOfflineBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/warning_light"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_4"
+        android:paddingVertical="@dimen/space_3"
+        tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
+
+        <!-- Warning Icon -->
+        <ImageView
+            android:id="@+id/offlineIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="@dimen/space_3"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_offline"
+            app:tint="@color/warning" />
+
+        <!-- Message Text -->
+        <TextView
+            android:id="@+id/offlineMessage"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="You're offline. Showing last update."
+            android:textColor="@color/text_primary" />
+
+        <!-- Dismiss Button -->
+        <ImageButton
+            android:id="@+id/btnDismissOffline"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:contentDescription="@string/dismiss"
+            android:padding="@dimen/space_1"
+            android:src="@drawable/ic_close"
+            app:tint="@color/text_secondary" />
+
+    </LinearLayout>
+
+</merge>

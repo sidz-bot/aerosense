@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.AeroSense.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/space_4"
+    android:layout_marginVertical="@dimen/space_2"
+    android:minHeight="@dimen/card_min_height"
+    app:cardElevation="@dimen/card_elevation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_4">
+
+        <!-- Skeleton Flight Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Skeleton Airline Logo -->
+            <View
+                android:id="@+id/skeletonAirlineLogo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="@dimen/space_3"
+                android:background="@color/gray_200"
+                android:contentDescription="@null" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Skeleton Flight Number -->
+                <View
+                    android:id="@+id/skeletonFlightNumber"
+                    android:layout_width="80dp"
+                    android:layout_height="20dp"
+                    android:background="@color/gray_200" />
+
+                <!-- Skeleton Flight Route -->
+                <View
+                    android:id="@+id/skeletonFlightRoute"
+                    android:layout_width="100dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="@dimen/space_2"
+                    android:background="@color/gray_200" />
+            </LinearLayout>
+
+            <!-- Skeleton Status Badge -->
+            <View
+                android:id="@+id/skeletonStatusBadge"
+                android:layout_width="48dp"
+                android:layout_height="20dp"
+                android:background="@color/gray_200" />
+        </LinearLayout>
+
+        <!-- Skeleton Departure Time -->
+        <View
+            android:id="@+id/skeletonDepartureTime"
+            android:layout_width="60dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="@dimen/space_3"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Gate Info -->
+        <View
+            android:id="@+id/skeletonGateInfo"
+            android:layout_width="72dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="@dimen/space_1"
+            android:background="@color/gray_200" />
+
+        <!-- Skeleton Status Container -->
+        <LinearLayout
+            android:id="@+id/skeletonStatusContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_3"
+            android:background="@color/gray_100"
+            android:orientation="vertical"
+            android:padding="@dimen/space_3">
+
+            <!-- Skeleton Status Text -->
+            <View
+                android:id="@+id/skeletonStatusText"
+                android:layout_width="96dp"
+                android:layout_height="16dp"
+                android:background="@color/gray_200" />
+
+            <!-- Skeleton Status Message -->
+            <View
+                android:id="@+id/skeletonStatusMessage"
+                android:layout_width="160dp"
+                android:layout_height="14dp"
+                android:layout_marginTop="@dimen/space_1"
+                android:background="@color/gray_200" />
+
+            <!-- Skeleton Updated Time -->
+            <View
+                android:id="@+id/skeletonUpdatedTime"
+                android:layout_width="112dp"
+                android:layout_height="12dp"
+                android:layout_marginTop="@dimen/space_1"
+                android:background="@color/gray_200" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

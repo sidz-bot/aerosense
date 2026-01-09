@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/space_6">
+
+    <!-- Empty Icon - Bell -->
+    <ImageView
+        android:id="@+id/emptyIcon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_notification"
+        app:tint="@color/text_tertiary" />
+
+    <!-- Empty Title -->
+    <TextView
+        android:id="@+id/emptyTitle"
+        style="@style/TextAppearance.Material3.TitleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_6"
+        android:text="@string/empty_notifications_title"
+        android:textColor="@color/text_primary" />
+
+    <!-- Empty Message -->
+    <TextView
+        android:id="@+id/emptyMessage"
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_2"
+        android:text="@string/empty_notifications_message"
+        android:textColor="@color/text_secondary" />
+
+    <!-- Notification Info Subtitle -->
+    <TextView
+        android:id="@+id/emptySubtitle"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_3"
+        android:gravity="center"
+        android:text="We'll notify you of gate changes, delays, and connection risks."
+        android:textColor="@color/text_tertiary" />
+
+    <!-- Primary Action Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/primaryActionButton"
+        style="@style/Widget.AeroSense.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_6"
+        android:minWidth="200dp"
+        android:text="Add a flight to get started" />
+
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Flight Not Found Error View -->
+    <LinearLayout
+        android:id="@+id/flightNotFoundContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/space_6"
+        tools:parentTag="android.widget.FrameLayout">
+
+        <!-- Error Icon -->
+        <ImageView
+            android:id="@+id/errorIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="@dimen/space_4"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_error"
+            app:tint="@color/text_tertiary" />
+
+        <!-- Error Title -->
+        <TextView
+            android:id="@+id/tvErrorTitle"
+            style="@style/TextAppearance.Material3.TitleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_2"
+            android:gravity="center"
+            android:text="Flight not found"
+            android:textColor="@color/text_primary" />
+
+        <!-- Error Message -->
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_4"
+            android:gravity="center"
+            android:text="Check the flight number and try again."
+            android:textColor="@color/text_secondary" />
+
+        <!-- Try Again Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTryAgain"
+            style="@style/Widget.AeroSense.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/button_height_large"
+            android:text="Try Again" />
+
+        <!-- Search by Route Link -->
+        <TextView
+            android:id="@+id/tvSearchByRoute"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:text="Search by route instead"
+            android:textColor="@color/primary_500"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</merge>
